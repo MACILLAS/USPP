@@ -275,7 +275,7 @@ def scribbsDefect1B():
     ### return the segmentation of reference frame ###
     #return avg_mask
 
-def scribbsDefect(AUG_DIR = "./zaid_spall_lenz/defect_1b_subset/aug", scribbs=None):
+def scribbsDefect(AUG_DIR = "./zaid_spall_lenz/defect_1b_subset/aug", scribbs=None, save=True):
     """
     Instead of using the inliers to create the ensemble mask.
     This program uses the inlier to create scribble (seed points)
@@ -349,11 +349,11 @@ def scribbsDefect(AUG_DIR = "./zaid_spall_lenz/defect_1b_subset/aug", scribbs=No
     avg_mask = closing(closing(closing(avg_mask)))
     avg_mask = dilation(erosion(dilation(dilation(avg_mask))))
 
-    segwscribb_dev.saveMask(row, col, chn, avg_mask, "avg_mask")
-    print("Program Completed")
+    if save:
+        segwscribb_dev.saveMask(row, col, chn, avg_mask, "avg_mask")
+        print("Program Completed")
 
-    ### return the segmentation of reference frame ###
-    #return avg_mask
+    return avg_mask
 
 if __name__ == "__main__":
 
