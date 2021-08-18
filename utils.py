@@ -4,10 +4,13 @@ import cv2
 from sklearn.metrics import mean_squared_error
 from scipy.stats import zscore, mode
 from segwscribb_dev import saveMask
+from skimage import transform
 from skimage.metrics import structural_similarity as ssim
 from skimage.morphology import (erosion, dilation, opening, closing, square)
+import random
+import imgaug.augmenters as iaa
 
-def consensus_masks_ssim (list_masks, ssim_thresh=0.8):
+def consensus_masks_ssim(list_masks, ssim_thresh=0.8):
     """
     This function is very similar to the consensus_mask that utilizes ssim instead of MSE.
     I think this function is definetly more reliable than MSE.
@@ -25,7 +28,8 @@ def consensus_masks_ssim (list_masks, ssim_thresh=0.8):
     inliers_array = np.zeros(mask_vect_len)
 
     for i in range(mask_vect_len):
-        ssim_list = [ssim(mask_vects[i], vect, data_range=mask_vects[i].max() - mask_vects[i].min()) for vect in mask_vects]
+        ssim_list = [ssim(mask_vects[i], vect, data_range=mask_vects[i].max() - mask_vects[i].min()) for vect in
+                     mask_vects]
         ssim_array = np.array(ssim_list)
         inliers = sum(ssim_array > ssim_thresh) - 1
         inliers_array[i] = inliers
@@ -36,12 +40,13 @@ def consensus_masks_ssim (list_masks, ssim_thresh=0.8):
 
     inliers_mode = max_mode(inliers_array)
     inliers = np.sum(inliers_array == inliers_mode)
-    if inliers_mode >= int(mask_vect_len / 3) and inliers >= int(mask_vect_len/3):
+    if inliers_mode >= int(mask_vect_len / 3) and inliers >= int(mask_vect_len / 3):
         return inliers_array == inliers_mode
     else:
         return np.zeros(mask_vect_len, dtype=bool)
 
-def consensus_masks (list_masks, mae_thresh=0.6):
+
+def consensus_masks(list_masks, mae_thresh=0.6):
     """
     This function takes a list of masks and returns the argwhere the masks agree
     :param list_masks: [[mask], [mask], [mask] ... ]
@@ -68,10 +73,11 @@ def consensus_masks (list_masks, mae_thresh=0.6):
     # Otherwise return all False...
     inliers_mode = max_mode(inliers_array)
     inliers = np.sum(inliers_array == inliers_mode)
-    if np.average([inliers_mode, inliers]) > int(mask_vect_len/3):
+    if np.average([inliers_mode, inliers]) > int(mask_vect_len / 3):
         return inliers_array == inliers_mode
     else:
         return np.zeros(mask_vect_len, dtype=bool)
+
 
 def max_mode(inliers_array):
     '''
@@ -89,6 +95,7 @@ def max_mode(inliers_array):
 
     comb_array = uniques_mode * uniques
     return uniques[np.argmax(comb_array)]
+
 
 def mode_scribb(masks, percent=0.2):
     """
@@ -112,7 +119,7 @@ def mode_scribb(masks, percent=0.2):
     values = masks[rand_coord[:, 0], rand_coord[:, 1], :]
     values_mode = mode(values, axis=1)
     # create bool array when the mode of the
-    bool = values_mode[1] > (0.75*chn)
+    bool = values_mode[1] > (0.75 * chn)
 
     # create a boolean mask True where is part of percent chosen pixels and has same value between images
     scribb_bool = np.zeros((row, col), dtype=np.int8)
@@ -127,6 +134,7 @@ def mode_scribb(masks, percent=0.2):
     scribb[scribb == 0] = 256
     scribb = scribb - 1
     return scribb
+
 
 def consensus_scribb(masks, percent=0.3):
     """
@@ -170,7 +178,8 @@ def consensus_scribb(masks, percent=0.3):
     scribb = scribb - 1
     return scribb
 
-def process_raw_mask (mask):
+
+def process_raw_mask(mask):
     """
     This function takes the raw image mask as input from the network and corrects it.
     The numbering of the mask will be descending number of pixels in that class
@@ -201,8 +210,9 @@ def process_raw_mask (mask):
 
     return mask
 
-def filter_img (img, filter="BLUR", **kwargs):
-    '''
+
+def filter_img(img, filter="BLUR", **kwargs):
+    """
     This utility takes a numerical mask and filters it using specified filter.
     The default filter is BLUR
 
@@ -213,10 +223,10 @@ def filter_img (img, filter="BLUR", **kwargs):
     :param filter: string {"BILATERAL", "BLUR", "GAUSSIAN", "MEDIANBLUR"}
     :param **kwargs: filter parameters as required
     :return: filtered mask
-    '''
+    """
     assert img is not None
     if filter == "BLUR":
-        mask = cv2.blur(img, ksize=(kwargs['row'], kwargs['col'])) #this argument may not be correct
+        mask = cv2.blur(img, ksize=(kwargs['row'], kwargs['col']))  # this argument may not be correct
         mask = np.ceil(mask)
         return mask
     elif filter == "MEDIANBLUR":
@@ -228,12 +238,65 @@ def filter_img (img, filter="BLUR", **kwargs):
     else:
         return img
 
-def opening_mask (mask, size=3):
-    '''
+
+def opening_mask(mask, size=3):
+    """
     Morphological opening on an image is defined as an erosion followed by a dilation.
 
     :param mask:
     :param size:
     :return:
-    '''
+    """
     return opening(mask, square(size))
+
+def rand_img_aug (img, prob=0.5, save=False, file_name="rand_aug.png"):
+    """
+    Takes an image and augmentation probability.
+    A random image augmentation [BilateralBlur, EnhanceBrightness, AddToHueAndSaturation, Spatter, Autocontrast] is applied.
+    :param img: Image to be transformed
+    :param prob: The probability that the image will be transformed. The specific transformation is randomly choosen.
+    :param save: Save the augmented image
+    :param file_name: file_name to save the augmented image
+    :return: augmented image
+    """
+    n_augs = 5 #currently supporting 5 different augmentations
+    rand_n = random.random()
+    if rand_n < prob:
+        if rand_n < prob/n_augs:
+            #print("Bilateral Blur")
+            aug = iaa.BilateralBlur(d=(3, 10), sigma_color=(10, 250), sigma_space=(10, 250))
+            img = aug.augment_image(image=img)
+        elif rand_n < 2 * (prob/n_augs):
+            #print("Enhance Brightness")
+            aug = iaa.pillike.EnhanceBrightness()
+            img = aug.augment_image(image=img)
+        elif rand_n < 3 * (prob/n_augs):
+            #print("AddToHueAndSaturation")
+            aug = iaa.AddToHueAndSaturation((-50, 50), per_channel=True)
+            img = aug.augment_image(image=img)
+        elif rand_n < 4 * (prob/n_augs):
+            #print("Spatter")
+            aug = iaa.imgcorruptlike.Spatter(severity=(1, 2))
+            img = aug.augment_image(image=img)
+        else:
+            #print("AutoContrast")
+            aug = iaa.pillike.Autocontrast((10, 20), per_channel=True)
+            img = aug.augment_image(image=img)
+    if save:
+        cv2.imwrite(file_name, img)
+    return img
+
+def single_img_aug_batch (img, batch_size=3):
+    """
+    For a single image create a batch where each image is the same image but subject to some augmentation.
+    :param img: input image for copies
+    :param batch_size: the number of copies
+    :return: numpy array in shape [row, col, chn * batch_size]
+    """
+    batch_img = np.array(img)
+    for _ in range(batch_size):
+        aug_img = rand_img_aug(img, prob=1, save=False)
+        aug_img = np.array(aug_img)
+        batch_img = np.concatenate((batch_img, aug_img), axis=2)
+
+    return batch_img

@@ -357,7 +357,16 @@ def scribbsDefect(AUG_DIR = "./zaid_spall_lenz/defect_1b_subset/aug", scribbs=No
 
 if __name__ == "__main__":
 
-    scribbsDefect(AUG_DIR="./zaid_spall_lenz/defect_1b_subset/aug")
+    #scribbsDefect(AUG_DIR="./zaid_spall_lenz/defect_1b_subset/aug")
+
+    im = cv2.imread("./199_rgb.png", -1)
+    im = cv2.blur(im, (5, 5))
+    row, col, chn = im.shape
+    mask = segwscribb_dev.segment(utils.single_img_aug_batch(im, 3), scribble=None, minLabels=3, nChannel=100, lr=0.001, stepsize_sim=1,
+                           stepsize_con=1, stepsize_scr=0.5, maxIter=100)
+    masks = utils.process_raw_mask(mask)
+    #masks = np.clip(masks, 0, 1)
+    segwscribb_dev.saveMask(row, col, chn, masks, "199_test")
 
     #prepDefect(REF_DIR="./zaid_spall_lenz/defect_2_subset/ref_frame",
     #               SUB_DIR="./zaid_spall_lenz/defect_2_subset/sub_frames",

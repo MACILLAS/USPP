@@ -75,8 +75,11 @@ def segment(im, scribble=None, minLabels=3, nChannel=100, lr=0.01, stepsize_sim=
         minLabels = len(mask_inds)
 
     # build model instance
-    row, col, chn = data.shape
-    #batch_size, row, col, chn = data.shape
+    if len(data.shape) > 3:
+        batch_size, row, col, chn = data.shape
+    else:
+        row, col, chn = data.shape
+
     model = MyNet(filters=nChannel, hidden_layers=hidden_layers)
     model = model.build(row, col, chn)
 
