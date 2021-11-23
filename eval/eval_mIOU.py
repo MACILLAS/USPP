@@ -52,15 +52,15 @@ def spall_sensitivity (folder_path="./spall_sensitivity"):
         onlyfiles = [i for i in listdir(join(folder_path, dirs)) if isfile(join(folder_path, dirs, i))]
 
         for file in onlyfiles:
-            print(file)
+            #print(file)
             if file[0] == "1":
                 im_gt_gray, im_mask_gray = miou_from_file(gt_file_1b, join(folder_path, dirs, file))
                 im_mask_gray = im_mask_gray[:228, :558]
-                print(miou(im_gt_gray, im_mask_gray[:, :], 2))
+                print(file + " " + str(miou(im_gt_gray, im_mask_gray[:, :], 2)))
             else:
                 im_gt_gray, im_mask_gray = miou_from_file(gt_file_2, join(folder_path, dirs, file))
                 im_mask_gray = im_mask_gray[:199, :384]
-                print(miou(im_gt_gray, im_mask_gray[:, :], 2))
+                print(file + " " + str(miou(im_gt_gray, im_mask_gray[:, :], 2)))
 
             #print(miou(im_gt_gray, im_mask_gray[1:, :], 2))
 

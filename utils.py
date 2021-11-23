@@ -306,10 +306,11 @@ def rand_perspective_transform (img, prob=0.5, scale=(0.05, 0.10), save=False):
     Takes an image in and apply a small perspective transformation
     """
     rand_n = random.random()
-    if rand_n > prob:
+    if rand_n < prob:
         aug = iaa.PerspectiveTransform(scale=scale, keep_size=True)
         img = aug.augment_image(img)
-        #cv2.imwrite("debug.png", img)
+        if save:
+            cv2.imwrite("debug.png", img)
     return img
 
 def rand_motion_blur (img, prob=0.5, severity=1, save=False):
@@ -317,8 +318,10 @@ def rand_motion_blur (img, prob=0.5, severity=1, save=False):
     Takes an image in an apply motion blur to the image
     """
     rand_n = random.random()
-    if rand_n > prob:
+    if rand_n < prob:
         aug = iaa.imgcorruptlike.MotionBlur(severity=(severity))
         img = aug.augment_image(img)
+        if save:
+            cv2.imwrite("debug.png", img)
     return img
 

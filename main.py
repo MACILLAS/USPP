@@ -32,8 +32,8 @@ def prepDefect(REF_DIR = "./zaid_spall_lenz/defect_1b_subset/ref_frame", SUB_DIR
 
     dim = (int(roi[2]*scale), int(roi[3]*scale))
 
-    #cv2.imwrite(os.path.join(AUG_DIR, ref_file), cv2.GaussianBlur(cv2.resize(detmarker.crop(ref_img, roi), dim), (5, 5), 1))
-    cv2.imwrite(os.path.join(AUG_DIR, ref_file), cv2.blur(cv2.resize(detmarker.crop(ref_img, roi), dim), (3, 3)))
+    cv2.imwrite(os.path.join(AUG_DIR, ref_file), cv2.GaussianBlur(cv2.resize(detmarker.crop(ref_img, roi), dim), (7, 7), 15)) #15 works
+    #cv2.imwrite(os.path.join(AUG_DIR, ref_file), cv2.blur(cv2.resize(detmarker.crop(ref_img, roi), dim), (3, 3)))
     #cv2.imwrite(os.path.join(AUG_DIR, ref_file), cv2.resize(detmarker.crop(ref_img, roi), dim))
 
     for imgFile in sub_file:
@@ -43,8 +43,8 @@ def prepDefect(REF_DIR = "./zaid_spall_lenz/defect_1b_subset/ref_frame", SUB_DIR
         row, col, _ = img.shape
         gray_img_temp = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
         if cv2.countNonZero(gray_img_temp) > (0.95 * row * col):
-            #cv2.imwrite(os.path.join(AUG_DIR, imgFile), cv2.GaussianBlur(cv2.resize(img, dim), (5, 5), 1))
-            cv2.imwrite(os.path.join(AUG_DIR, imgFile), cv2.blur(cv2.resize(img, dim), (3, 3)))
+            cv2.imwrite(os.path.join(AUG_DIR, imgFile), cv2.GaussianBlur(cv2.resize(img, dim), (3, 3), 1))
+            #cv2.imwrite(os.path.join(AUG_DIR, imgFile), cv2.blur(cv2.resize(img, dim), (3, 3)))
             #cv2.imwrite(os.path.join(AUG_DIR, imgFile), cv2.resize(img, dim))
 
 def prepTestData():
@@ -234,7 +234,7 @@ def scribbsDefect(AUG_DIR = "./zaid_spall_lenz/defect_1b_subset/aug", scribbs=No
         masks = [segwscribb_dev.segment(im, scribble=scribbs, minLabels=3, nChannel=100, lr=0.001, stepsize_sim=1,
                                         stepsize_con=1, stepsize_scr=0.5, maxIter=200) for im in images]
         # Sensitivity Study
-        #masks = [segwscribb_dev.segment(utils.rand_perspective_transform(im, 0.3, (0.1, 0.15)), scribble=scribbs, minLabels=3, nChannel=100, lr=0.001, stepsize_sim=1,
+        #masks = [segwscribb_dev.segment(utils.rand_perspective_transform(im, 0.1, (0.01, 0.05)), scribble=scribbs, minLabels=3, nChannel=100, lr=0.001, stepsize_sim=1,
         #                                stepsize_con=1, stepsize_scr=0.5, maxIter=200) for im in images]
         masks = [utils.process_raw_mask(mask) for mask in masks]
 
@@ -282,7 +282,7 @@ def scribbsDefect(AUG_DIR = "./zaid_spall_lenz/defect_1b_subset/aug", scribbs=No
     avg_mask = np.clip(avg_mask, a_min=0, a_max=1)
     avg_mask = erosion(avg_mask)
     avg_mask = closing(closing(closing(avg_mask)))
-    avg_mask = dilation(erosion(dilation(dilation(avg_mask))))
+    #avg_mask = dilation(erosion(dilation(dilation(avg_mask))))
 
     if save:
         segwscribb_dev.saveMask(row, col, chn, avg_mask, "avg_mask")
@@ -292,7 +292,11 @@ def scribbsDefect(AUG_DIR = "./zaid_spall_lenz/defect_1b_subset/aug", scribbs=No
 
 if __name__ == "__main__":
 
-    scribbsDefect(AUG_DIR="./zaid_spall_lenz/defect_1b_subset/aug")
+    prepDefect(REF_DIR="./zaid_spall_lenz/defect_2_subset/ref_frame",
+                   SUB_DIR="./zaid_spall_lenz/defect_2_subset/sub_frames",
+                   AUG_DIR="./zaid_spall_lenz/defect_2_subset/aug", scale=0.5)
+
+    scribbsDefect(AUG_DIR="./zaid_spall_lenz/defect_2_subset/aug")
 
     #prepDefect(REF_DIR="./zaid_spall_lenz/defect_2_subset/ref_frame",
     #               SUB_DIR="./zaid_spall_lenz/defect_2_subset/sub_frames",
