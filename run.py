@@ -27,7 +27,7 @@ r = requests.post(url, files=multiple_files, data=data)
 
 
 @app.route("/predict", methods=["POST"])
-def segment():
+def predict():
     defect_img = None
     scribble = None
     if request.method == "POST":
@@ -39,13 +39,18 @@ def segment():
                 if file is not None:
                     scribble = Image.open(file.stream)
 
+    return segment(defect_img, scribble)
 
+
+def segment(defect_img, scribble):
     if scribble is None:
-        mask = segwscribb_dev.segment(defect_img, scribble=None, minLabels=3, nChannel=100, lr=0.01, stepsize_sim=1, stepsize_con=1, stepsize_scr=0.5, maxIter=200)
+        mask = segwscribb_dev.segment(defect_img, scribble=None, minLabels=3, nChannel=100, lr=0.01, stepsize_sim=1,
+                                      stepsize_con=1, stepsize_scr=0.5, maxIter=200)
     else:
-        mask = segwscribb_dev.segment(defect_img, scribble=scribble, minLabels=3, nChannel=100, lr=0.01, stepsize_sim=1, stepsize_con=1, stepsize_scr=0.5, maxIter=200)
-
+        mask = segwscribb_dev.segment(defect_img, scribble=scribble, minLabels=3, nChannel=100, lr=0.01, stepsize_sim=1,
+                                      stepsize_con=1, stepsize_scr=0.5, maxIter=200)
     return mask
+
 
 if __name__ == "__main__":
     app.run(host='0.0.0.0')
