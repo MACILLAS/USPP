@@ -33,7 +33,7 @@ def predict():
     scribble = None
     if request.method == "POST":
         files = request.files.to_dict(flat=False)  # WORKS
-        for i, file in enumerate(files):    # TEST ENUMERATE
+        for i, file in enumerate(files):    # TEST ENUMERATE (Does not work?)
             prediction = i
 
         # encoded_str = base64.b64encode(files)
@@ -49,7 +49,7 @@ def predict():
         # prediction = segment(defect_img, scribble)
     # else:
     #    prediction = "ERROR"
-    return prediction
+    return str(prediction)
 
 
 def segment(defect_img, scribble):
