@@ -32,21 +32,25 @@ def predict():
     defect_img = None
     scribble = None
     if request.method == "POST":
-        files = request.files.to_dict(flat=False)
-        prediction = "Hello"
-        #encoded_str = base64.b64encode(files[0])
-        #prediction = jsonify({"img": encoded_str})
+        files = request.files.to_dict(flat=False)  # WORKS
+        for i, file in enumerate(files):    # TEST ENUMERATE
+            prediction = i
 
-        #for i, file in enumerate(files):
+        # encoded_str = base64.b64encode(files)
+
+        # prediction = jsonify({"img": encoded_str})
+
+        # for i, file in enumerate(files):
         #    if i == 0:
         #        defect_img = Image.open(file.stream)
         #    else:
         #        if file is not None:
         #            scribble = Image.open(file.stream)
-        #prediction = segment(defect_img, scribble)
-    #else:
+        # prediction = segment(defect_img, scribble)
+    # else:
     #    prediction = "ERROR"
     return prediction
+
 
 def segment(defect_img, scribble):
     if scribble is None:
