@@ -29,24 +29,20 @@ r = requests.post(url, files=multiple_files, data=data)
 
 @app.route("/predict", methods=["POST"])
 def predict():
-    @copy_current_request_context
-    def foo():
-        defect_img = None
-        scribble = None
-        if request.method == "POST":
-            files = request.files.to_dict(flat=False)
-            for i, file in enumerate(files):
-                if i == 0:
-                    defect_img = Image.open(file.stream)
-                else:
-                    if file is not None:
-                        scribble = Image.open(file.stream)
-            prediction = segment(defect_img, scribble)
-        else:
-            prediction = "ERROR"
-        return prediction
-    threading.Thread(target=foo).start()
-    return jsonify({'status': 'started'})
+    defect_img = None
+    scribble = None
+    if request.method == "POST":
+        files = request.files.to_dict(flat=False)
+        for i, file in enumerate(files):
+            if i == 0:
+                defect_img = Image.open(file.stream)
+            else:
+                if file is not None:
+                    scribble = Image.open(file.stream)
+        prediction = segment(defect_img, scribble)
+    else:
+        prediction = "ERROR"
+    return prediction
 
 def segment(defect_img, scribble):
     if scribble is None:
