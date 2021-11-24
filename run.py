@@ -36,8 +36,8 @@ def predict():
         for i, file in enumerate(files):    # WORKS
             prediction = i
             if i == 0:
-                defect_img = Image.open(file.stream)
-                encoded_str = base64.b64encode(defect_img)
+                defect_img = Image.open(file) # NO WORK
+                #encoded_str = base64.b64encode(defect_img)
 
         # prediction = jsonify({"img": encoded_str})
 
@@ -50,7 +50,7 @@ def predict():
         # prediction = segment(defect_img, scribble)
     # else:
     #    prediction = "ERROR"
-    return encoded_str
+    return prediction
 
 
 def segment(defect_img, scribble):
