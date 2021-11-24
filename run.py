@@ -33,8 +33,9 @@ def predict():
     scribble = None
     if request.method == "POST":
         files = request.files.to_dict(flat=False)
-        encoded_str = base64.b64encode(files[0])
-        prediction = jsonify({"img": encoded_str})
+        prediction = "Hello"
+        #encoded_str = base64.b64encode(files[0])
+        #prediction = jsonify({"img": encoded_str})
 
         #for i, file in enumerate(files):
         #    if i == 0:
