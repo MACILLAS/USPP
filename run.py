@@ -32,7 +32,7 @@ def predict():
     defect_img = None
     scribble = None
     if request.method == "POST":
-        prediction = "Hello"
+        prediction = jsonify({"Hello": "World"})
         #files = request.files.to_dict(flat=False)
         #for i, file in enumerate(files):
         #    if i == 0:
