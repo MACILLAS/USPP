@@ -6,7 +6,7 @@ from PIL import Image
 import segwscribb_dev
 from flask import Flask, request, jsonify, copy_current_request_context
 import numpy as np
-import threading
+import base64
 
 app = Flask(__name__)
 
@@ -32,8 +32,10 @@ def predict():
     defect_img = None
     scribble = None
     if request.method == "POST":
-        prediction = jsonify({"Hello": "World"})
-        #files = request.files.to_dict(flat=False)
+        files = request.files.to_dict(flat=False)
+        encoded_str = base64.b64encode(files[0])
+        prediction = jsonify({"img": encoded_str})
+
         #for i, file in enumerate(files):
         #    if i == 0:
         #        defect_img = Image.open(file.stream)
