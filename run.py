@@ -50,7 +50,7 @@ def predict():
         # prediction = segment(defect_img, scribble)
     # else:
     #    prediction = "ERROR"
-    return prediction
+    return str(prediction)
 
 
 def segment(defect_img, scribble):
