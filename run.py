@@ -29,12 +29,10 @@ r = requests.post(url, files=multiple_files, data=data)
 
 @app.route("/predict", methods=["POST"])
 def predict():
-    defect_img = None
-    scribble = None
     if request.method == "POST":
         data = request.json
         defect_arr = np.array(data['image'])
-        #encoded_str = base64.b64encode(defect_img)
+        scribble_arr = np.array(data['scribble'])
 
         # prediction = jsonify({"img": encoded_str})
 
@@ -47,9 +45,9 @@ def predict():
         # prediction = segment(defect_img, scribble)
     # else:
     #    prediction = "ERROR"
-    return {'image': defect_arr.tolist()}
+    prediction = segment(defect_arr, scribble_arr)
 
-
+    return {'prediction': prediction.tolist()}
 
 def segment(defect_img, scribble):
     if scribble is None:
