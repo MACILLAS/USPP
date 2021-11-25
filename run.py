@@ -32,14 +32,9 @@ def predict():
     defect_img = None
     scribble = None
     if request.method == "POST":
-        files = request.files.to_dict(flat=False)  # WORKS
-        #defect_img = Image.open(files["image"][0].stream)
-        defect_img = np.array(files["image"][0].stream)
-        #for i, file in enumerate(files):    # WORKS
-        #    prediction = i
-        #    if i == 0:
-        #        defect_img = Image.open(file["image"]) # NO WORK ("image")
-        encoded_str = base64.b64encode(defect_img)
+        data = request.json
+        defect_arr = np.array(data['image'])
+        #encoded_str = base64.b64encode(defect_img)
 
         # prediction = jsonify({"img": encoded_str})
 
@@ -52,7 +47,8 @@ def predict():
         # prediction = segment(defect_img, scribble)
     # else:
     #    prediction = "ERROR"
-    return encoded_str
+    return {'image': defect_arr.tolist()}
+
 
 
 def segment(defect_img, scribble):
