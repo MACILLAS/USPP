@@ -33,11 +33,12 @@ def predict():
     scribble = None
     if request.method == "POST":
         files = request.files.to_dict(flat=False)  # WORKS
-        for i, file in enumerate(files):    # WORKS
-            prediction = i
-            if i == 0:
-                defect_img = Image.open(file["image"][0]) # NO WORK
-                encoded_str = base64.b64encode(defect_img)
+        defect_img = Image.open(files["image"])
+        #for i, file in enumerate(files):    # WORKS
+        #    prediction = i
+        #    if i == 0:
+        #        defect_img = Image.open(file["image"]) # NO WORK ("image")
+        encoded_str = base64.b64encode(defect_img)
 
         # prediction = jsonify({"img": encoded_str})
 
