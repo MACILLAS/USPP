@@ -33,7 +33,7 @@ def predict():
     scribble = None
     if request.method == "POST":
         files = request.files.to_dict(flat=False)  # WORKS
-        defect_img = Image.open(files["image"][0])
+        defect_img = Image.open(files["image"][0].stream)
         #for i, file in enumerate(files):    # WORKS
         #    prediction = i
         #    if i == 0:
