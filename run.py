@@ -48,7 +48,8 @@ def predict():
     #prediction = segment(defect_arr, scribble_arr) #scribble_arr is not registering None
 
     #return {'prediction': prediction.tolist()}
-    return {'prediction': type(scribble_arr)}
+    test = scribble_arr is None
+    return {'prediction': str(test)}
 
 def segment(defect_img, scribble):
     if scribble is None:
