@@ -55,9 +55,7 @@ def main ():
        t.start()
        
     for t in threads:
-        t.join()
-       
-        
+        t.join() 
     '''
     print(usp_request(url, im, None))
 
