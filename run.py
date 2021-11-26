@@ -26,32 +26,19 @@ multiple_files = [
 r = requests.post(url, files=multiple_files, data=data)
 '''
 
-
 @app.route("/predict", methods=["POST"])
 def predict():
     if request.method == "POST":
         data = request.json
         defect_arr = np.array(data['image'])
 
-        # Test if data['scribble'] is None...
-        scribble_arr = np.array(data['scribble'])
+        if data['scribble'] is None:
+            scribble_arr = None
+        else:
+            scribble_arr = np.array(data['scribble'])
 
-        # prediction = jsonify({"img": encoded_str})
-
-        # for i, file in enumerate(files):
-        #    if i == 0:
-        #        defect_img = Image.open(file.stream)
-        #    else:
-        #        if file is not None:
-        #            scribble = Image.open(file.stream)
-        # prediction = segment(defect_img, scribble)
-    # else:
-    #    prediction = "ERROR"
-    #prediction = segment(defect_arr, scribble_arr) #scribble_arr is not registering None
-
-    #return {'prediction': prediction.tolist()}
-    test = data['scribble'] is None
-    return {'prediction': str(test)}
+    prediction = segment(defect_arr, scribble_arr)
+    return {'prediction': prediction}
 
 def segment(defect_img, scribble):
     if scribble is None:
