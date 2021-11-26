@@ -38,7 +38,7 @@ def predict():
             scribble_arr = np.array(data['scribble'])
 
     prediction = segment(defect_arr, scribble_arr)
-    return {'prediction': prediction}
+    return {'prediction': prediction.tolist()}
 
 def segment(defect_img, scribble):
     if scribble is None:
