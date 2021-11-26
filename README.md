@@ -1,4 +1,4 @@
-# Unsupervised semantic Segmentation with Pose Prior (USPP)
+# Unsupervised semantic Segmentation with Pose Prior (USP)
 By: Max Midwinter </br>
 CVISS Labs, Dept. CEE, University of Waterloo <br/>
 Rogers 5G Smart Infrastructure, 2021
@@ -24,6 +24,35 @@ scribbsDefect takes 2 parameters:
     * save: save output image
       * For Debug save image (saved in current directory)
 
-## Details
+## Docker Serving
+
+### Install Docker
+```
+pip install docker
+```
+
+### Pull Compatible Tensorflow Docker Image
+```
+# Let me know if this does not work...
+docker pull tensorflow/tensorflow:2.4.2-gpu
+```
+
+### Build Docker Image
+Build docker image usp with your choice of tag
+```
+docker docker build -t usp:TAG .
+```
+
+### Run Docker Image
+```angular2html
+docker run usp:TAG
+```
+If you are running on local computer this command will start a dev server.
+(i.e. http://172.17.0.2:5000/)
+
+You can now push your docker image to a container registry of your choice and deploy a kubernetes service...
+
+To take advantage of parallel inference... Run main_docker.py (with your API)
+
 
 

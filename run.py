@@ -1,12 +1,11 @@
 """
 run.py is the entrypoint for USP docker container.
 """
-import io
-from PIL import Image
 import segwscribb_dev
 from flask import Flask, request, jsonify, copy_current_request_context
 import numpy as np
 import base64
+#from utils import rand_perspective_transform, rand_motion_blur
 
 app = Flask(__name__)
 
@@ -30,25 +29,27 @@ r = requests.post(url, files=multiple_files, data=data)
 def predict():
     if request.method == "POST":
         data = request.json
+
         defect_arr = np.array(data['image'])
+        minLabel = int(data['minLabels'])
+        nChannel = int(data['nChannel'])
+        lr = float(data['lr'])
+        stepsize_sim = float(data['stepsize_sim'])
+        stepsize_con = float(data['stepsize_con'])
+        stepsize_scr = float(data['stepsize_scr'])
+        maxIter = int(data['maxIter'])
 
         if data['scribble'] is None:
             scribble_arr = None
         else:
             scribble_arr = np.array(data['scribble'])
 
-    prediction = segment(defect_arr, scribble_arr)
-    return {'prediction': prediction.tolist()}
+        prediction = segwscribb_dev.segment(im=defect_arr, scribble=scribble_arr, minLabels=minLabel, nChannel=nChannel,
+                                            lr=lr, stepsize_sim=stepsize_sim, stepsize_con=stepsize_con,
+                                            stepsize_scr=stepsize_scr, maxIter=maxIter)
 
-def segment(defect_img, scribble):
-    if scribble is None:
-        mask = segwscribb_dev.segment(defect_img, scribble=None, minLabels=3, nChannel=100, lr=0.01, stepsize_sim=1,
-                                      stepsize_con=1, stepsize_scr=0.5, maxIter=200)
-    else:
-        mask = segwscribb_dev.segment(defect_img, scribble=scribble, minLabels=3, nChannel=100, lr=0.01, stepsize_sim=1,
-                                      stepsize_con=1, stepsize_scr=0.5, maxIter=200)
-    return mask
+    return {'prediction': prediction.tolist()}
 
 
 if __name__ == "__main__":
-    app.run(host='0.0.0.0', debug=True)
+    app.run(host='0.0.0.0')
