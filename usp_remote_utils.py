@@ -1,7 +1,7 @@
 import requests
 import os
 import cv2
-from threading import Thread
+import concurrent.futures
 
 def usp_request(url=None, image=None, scribble=None, minLabels=3, nChannel=100, lr=0.001, stepsize_sim=1, stepsize_con=1, stepsize_scr=0.5, maxIter=200):
     """
@@ -28,7 +28,6 @@ def usp_request(url=None, image=None, scribble=None, minLabels=3, nChannel=100, 
     r = requests.post(url, json=data)
     return r.json()
 
-
 def main ():
 
     url = 'http://172.17.0.2:5000/predict'
@@ -47,16 +46,8 @@ def main ():
     im = images[0]
 
     ### Multi-Threaded Example
-    '''
-    threads = []
-    for im in images:
-       t = Thread(target=usp_request, args=(url, im, scribble))
-       threads.append(t)
-       t.start()
-       
-    for t in threads:
-        t.join() 
-    '''
+
+
     print(usp_request(url, im, None))
 
 if __name__ == "__main__":
